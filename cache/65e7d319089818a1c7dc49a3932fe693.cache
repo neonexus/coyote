@@ -1,0 +1,9 @@
+<?
+function Coyote_SHORTCUTS($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+echo '<dl id="x-shortcuts">';
+echo $innerHTML;
+echo '</dl>';
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

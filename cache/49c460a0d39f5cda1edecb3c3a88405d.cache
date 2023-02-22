@@ -1,0 +1,21 @@
+<?
+function Coyote_DATAROW($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+$output = '';
+
+if($tag_name == 'DATAROW' || $tag_name == 'DR'){
+	$output .= '[';
+	$innerHTML = str_replace('\'\'', '\',\'', $innerHTML);
+	$output .= $innerHTML;
+	$output .= ']';
+} else {
+	$output .= '\'';
+	$output .= $innerHTML;
+	$output .= '\'';
+}
+
+echo $output;
+
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

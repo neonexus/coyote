@@ -1,0 +1,12 @@
+<?
+function Coyote_PHP($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+# DON'T EVER EVAL!!!!
+# "IF YOU MUST USE EVAL, YOU ARE ASKING THE WRONG QUESTION..."
+# Just use the built-in custom eval function "CoyoteProcessor::custom_eval($string)"
+
+$innerHTML = "<?\n".$innerHTML."\n?>";
+CoyoteProcessor::custom_eval($innerHTML);
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

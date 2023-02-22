@@ -1,0 +1,35 @@
+<?
+function Coyote_SHORTCUT($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+if(!empty($attribs['FOR'])){
+	echo '<dt id="'.$attribs['FOR'].'-shortcut">';
+	echo '<a href="#"><img src="'.CoyoteProcessor::$server_path.'extjs/examples/desktop/images/s.gif"/>';
+
+	if(!empty($innerHTML) && empty($attribs['LABEL']))
+		$attribs['LABEL'] = $innerHTML;
+	echo '<div id="'.$attribs['FOR'].'-label" class="">'.$attribs['LABEL'].'</div>';
+	echo '<div id="'.$attribs['FOR'].'-text" class="x-hidden"><input type="text" size="25" maxlength="50" id="'.$attribs['FOR'].'-textbox"/></div>';
+	echo '</a></dt>';
+	
+	/*if(!isset(CoyoteProcessor::$ext->label_switch_defined)){
+		$output = <<<ENDIT
+			function doLabelSwitch(which){
+				document.getElementById(which+'-textbox').value = document.getElementById(which+'-label').innerHTML;
+				document.getElementById(which+'-label').setAttribute('class', 'x-hidden');
+				document.getElementById(which+'-text').setAttribute('class', '');
+				document.getElementById(which+'-textbox').focus();
+			}
+			function doLabelSwitchR(which){
+				document.getElementById(which+'-label').innerHTML = document.getElementById(which+'-textbox').value;
+				document.getElementById(which+'-label').setAttribute('class', '');
+				document.getElementById(which+'-text').setAttribute('class', 'x-hidden');
+			}
+ENDIT;
+		CoyoteProcessor::$ext->label_switch_defined = true;
+		//CoyoteProcessor::$ext->script($output);
+		echo '<script language="text/javascript">'.$output.'</script>';
+	}*/
+}
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

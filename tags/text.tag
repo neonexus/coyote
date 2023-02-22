@@ -1,0 +1,37 @@
+<?
+## text ##
+## alias: txt ##
+## p        = ##
+## br      = ##
+## class = ##
+## font  = ##
+$out = "";
+if($attribs['BR'] == 'start' || $attribs['BR'] == 'both')
+	$out .= '<br/>';
+if($attribs['P'] == 'both'){
+	$out .= '<p>'.$innerHTML.'</p>';
+} else if($attribs['P'] == 'open' || $attribs['P'] == 'start'){
+	$out .= '<p>'.$innerHTML;
+} else if($attribs['P'] == 'close' || $attribs['P'] == 'end'){
+	$out .= $innerHTML.'</p>';
+} else {
+	$out .= $innerHTML;
+}
+if($attribs['BR'] == 'end' || $attribs['BR'] == 'both')
+	$out .= '<br/>';
+
+if(!empty($attribs['FONT'])){
+	$out2 = '<font';
+	$tmp = explode(',', $attribs['FONT']);
+	for($i=0; $i<count($tmp); $i++){
+		$tmp[$i] = explode(':', $tmp[$i]);
+		$out2 .= ' '.$tmp[$i][0].'="'.$tmp[$i][1].'"';
+	}
+	$out = $out2.'>'.$out.'</font>';
+}
+
+if(!empty($attribs['CLASS']))
+	$out = '<span class="'.$attribs['CLASS'].'">'.$out.'</span>';
+
+echo $out;
+?>

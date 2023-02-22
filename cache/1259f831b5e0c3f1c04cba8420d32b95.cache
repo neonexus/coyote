@@ -1,0 +1,6 @@
+<?
+function Coyote_COYOTE($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+?><font color="#ff0000">C</font>o<font color="#ff0000">yot</font>e<?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

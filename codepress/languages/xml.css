@@ -1,0 +1,10 @@
+/*
+ * CodePress color styles for XML syntax highlighting
+ * By NeoNexus DeMortis
+ */
+ 
+tag {color:#0000FF;} /* tags */
+attribname {color:#FF0000;} /* attribute names */
+attrib {color:#8800FF;} /* attribute values */
+comm, comm tag, comm attribname, comm attrib{color:#007700 !important;} /* comments */
+cdata, cdata tag, cdata attribname, cdata attrib {color:#FF9900 !important;} /* cdata */

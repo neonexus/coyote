@@ -1,0 +1,7 @@
+<?
+function Coyote_SPLITTER($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+echo '\'-\'';
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

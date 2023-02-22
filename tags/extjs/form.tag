@@ -1,0 +1,53 @@
+<?
+## form ##
+## var = ##
+## buttonAlign = ##
+## frame = true ##
+## formId = ##
+## itemCls = ##
+## labelAlign = left ##
+## labelWidth = ##
+## minButtonWidth = ##
+## monitorPoll = ##
+## monitorValid = true ##
+
+$output = '';
+
+//require(CoyoteProcessor::$inc_dir.'ext_nesting.php');
+CoyoteProcessor::$ext->startNest($attribs);
+
+//$output .=  'var '.$attribs['VAR'].' = ';
+//$output .= 'new Ext.form.FormPanel({';
+
+// This sets all forms to submit traditionally (via page load)
+//* NEED to change this sometime
+$output .= 'onSubmit: Ext.emptyFn,';
+//$output .= 'onSubmit:function(){blh=this.getForm().getEl();console.log(blh);},';
+//$output .= 'submit:function(){this.getForm().getEl().dom.submit();},';
+$output .= 'submit:function(){blh=this.getForm().getEl();console.log(blh);},';
+
+if(!empty($attribs['BUTTONALIGN'])){ $output .= 'buttonAlign:\''.$attribs['BUTTONALIGN'].'\','; }
+if(!empty($attribs['FORMID'])){ $output .= 'formId:\''.$attribs['FORMID'].'\','; }
+if(!empty($attribs['ITEMCLS'])){ $output .= 'itemCls:\''.$attribs['ITEMCLS'].'\','; }
+if($attribs['LABELALIGN'] != 'left'){ $output .= 'labelAlign:\''.$attribs['LABELALIGN'].'\','; }
+if(!empty($attribs['LABELWIDTH'])){ $output .= 'labelWidth:'.$attribs['LABELWIDTH'].','; }
+if(!empty($attribs['MINBUTTONWIDTH'])){ $output .= 'minButtonWidth:'.$attribs['MINBUTTONWIDTH'].','; }
+if(!empty($attribs['MONITORPOLL'])){ $output .= 'monitorPoll:'.$attribs['MONITORPOLL'].','; }
+if($attribs['MONITORVALID'] != 'true'){ $output .= 'monitorValid:false,'; }
+
+if(!empty(CoyoteProcessor::$ext->buttons)){
+	$attribs['BUTTONS'] = CoyoteProcessor::$ext->buttons;
+	unset(CoyoteProcessor::$ext->buttons);
+}
+
+$output .= CoyoteProcessor::$ext->run_panel($attribs);
+
+$innerHTML = str_replace('}{', '},{', $innerHTML);
+$output .= 'items:['.$innerHTML.']';
+
+//$output .= '});';
+
+//CoyoteProcessor::$ext->script($output);
+
+CoyoteProcessor::$ext->nest('Form', 'form.FormPanel', $output, $parent, $attribs);
+?>

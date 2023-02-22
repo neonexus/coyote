@@ -1,0 +1,14 @@
+<?
+function Coyote_IMG($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+##src=##
+$attribs['SRC'] = CoyoteProcessor::$server_path.$attribs['SRC'];
+$tmp = '';
+foreach($attribs as $key => $val){
+	if($key != 'SRC')
+		$tmp .= ' '.strtolower($key).'="'.$val.'"';
+}
+?>
+<img src="<?=$attribs['SRC']?>"<?=$tmp?>/><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

@@ -1,0 +1,12 @@
+<?
+function Coyote_STORAGEFIELD($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+$output = '{';
+if(!empty($attribs['NAME'])){ $output .= 'name:\''.$attribs['NAME'].'\','; }
+if(!empty($attribs['TYPE'])){ $output .= 'type:\''.$attribs['TYPE'].'\','; }
+if(!empty($attribs['DATEFORMAT'])){ $output .= 'dateFormat:\''.$attribs['DATEFORMAT'].'\','; }
+$output .= '}';
+echo $output;
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

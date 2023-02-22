@@ -1,0 +1,13 @@
+<?
+function Coyote_ITEM($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+$output = '';
+
+if(!empty($attribs['VAR'])){
+	$output .= 'var '.$attribs['VAR'].'=';
+	$output .= $innerHTML;
+	CoyoteProcessor::$ext->script($output);
+}
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

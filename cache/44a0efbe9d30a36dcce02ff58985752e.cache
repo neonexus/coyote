@@ -1,0 +1,9 @@
+<?
+function Coyote_DOCUMENT($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+echo $innerHTML;
+?>
+</body>
+</html><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

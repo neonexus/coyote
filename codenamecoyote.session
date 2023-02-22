@@ -1,0 +1,22 @@
+<!DOCTYPE webprojectsession>
+<webprojectsession>
+  <session usePreviewPrefix="1" previewPrefix="preview_" usePersistentBookmarks="0" >
+    <itemcursorpositions>
+      <item line="104" column="8" url="system/console.php" />
+      <item line="0" column="0" url="tags/extjs/button.tag" />
+      <item line="0" column="0" url="tags/extjs/ext.tag" />
+      <item line="0" column="0" url="system/ext.php" />
+    </itemcursorpositions>
+    <uploadprofiles defaultProfile="@" >
+      <profile remote_host="" remote_port="" remote_path="" remote_protocol="ftp" user="" name="@" />
+    </uploadprofiles>
+    <treestatus>
+      <openfolder url="apps" />
+      <openfolder url="pages" />
+      <openfolder url="system" />
+      <openfolder url="tags" />
+      <openfolder url="tags/extjs" />
+    </treestatus>
+  </session>
+  <teamdata yourself="" />
+</webprojectsession>

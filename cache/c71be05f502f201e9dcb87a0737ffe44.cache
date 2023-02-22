@@ -1,0 +1,7 @@
+<?
+function Coyote_TBAR($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+?>
+<?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

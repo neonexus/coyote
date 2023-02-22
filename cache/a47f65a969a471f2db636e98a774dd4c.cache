@@ -1,0 +1,15 @@
+<?
+function Coyote_LABEL($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+$output = '';
+
+if(!empty($attribs['FORID'])){ $output .= 'forId:\''.$attribs['FORID'].'\','; }
+if(!empty($innerHTML)){ $output .= 'html:"'.$innerHTML.'",'; }
+if(!empty($attribs['TEXT'])){ $output .= 'text:\''.$attribs['TEXT'].'\','; }
+
+$output .= CoyoteProcessor::$ext->run_boxComponent($attribs);
+
+CoyoteProcessor::$ext->nest('Label', 'form.Label', $output, $parent, $attribs);
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

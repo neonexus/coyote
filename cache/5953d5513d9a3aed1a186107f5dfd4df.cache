@@ -1,0 +1,6 @@
+<?
+function Coyote_COMBOBOX($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

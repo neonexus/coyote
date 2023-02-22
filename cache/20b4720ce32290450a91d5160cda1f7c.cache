@@ -1,0 +1,14 @@
+<?
+function Coyote_HIDDEN($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+$output = '';
+
+//require(CoyoteProcessor::$inc_dir.'ext_nesting.php');
+CoyoteProcessor::$ext->startNest($attribs);
+
+$output .= CoyoteProcessor::$ext->run_field($attribs);
+
+CoyoteProcessor::$ext->nest('Hidden', 'form.Hidden', $output, $parent, $attribs);
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

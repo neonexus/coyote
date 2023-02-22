@@ -1,0 +1,14 @@
+<?
+function Coyote_SPACER($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+if($tag_name == 'SPACER'){
+	if(strpos($breadcrumbs, 'EXT') !== false)
+		CoyoteProcessor::$ext->block('<img src="'.CoyoteProcessor::$server_path.'extjs/resources/images/default/s.gif" width="'.$attribs['WIDTH'].'" height="'.$attribs['HEIGHT'].'"/>');
+	else
+		echo '<img src="'.CoyoteProcessor::$server_path.'extjs/resources/images/default/s.gif" width="'.$attribs['WIDTH'].'" height="'.$attribs['HEIGHT'].'"/>';
+} else {
+	echo '\'->\'';
+}
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

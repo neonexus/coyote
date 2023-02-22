@@ -1,0 +1,828 @@
+<?
+function Coyote_DESKTOP2($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+$sp = CoyoteProcessor::$server_path;
+$sp = str_replace('http://', '', $sp);
+$sp = substr($sp, strpos($sp, '/'));
+
+# This is a VERY Important block, this is how our we initialize our security layer...
+# And let me tell you, it's a doosy of a security layer.
+# It may seem simple, but in the eyes of a hacker, it's a nightmare.
+#
+# The server generates 'random' keys upon every visit.
+# These keys are then sent to the client.
+# The client then uses the first key to encrypt messages to be sent to the server,
+# including the 2 keys themselves.
+$ckey1 = MD5(MD5(MD5(time())));
+$ckey2 = MD5(time().$ckey1);
+
+$_SESSION['ckey1'] = $ckey1;
+$_SESSION['ckey2'] = $ckey2;
+
+//CoyoteProcessor::$ext->script(file_get_contents('../codepress/ext_codepress.js'));
+CoyoteProcessor::$ext->block('<script src="'.$sp.'codepress/ext_codepress.js"></script>');
+
+CoyoteProcessor::$ext->script(<<<ENDIT
+Ext.ns('desktop', 'desktop.apps', 'desktop.appIds');
+
+desktop = {
+	open:function(which){
+		var win = Ext.WindowMgr.get(which.getId());
+		if(!win){
+			var desk = Ext.getCmp('desktop').body;
+			win = which;
+			if(!win.rendered)
+				win.render(desk);
+		}
+		win.show();
+	},
+	openApp:function(which){
+		Ext.Msg.wait('Loading Application...');
+		var getIt = true;
+		var doAdd = true;
+		if(desktop.apps.length > 0){
+			for(var i=0;i<desktop.apps.length;i++){
+				if(desktop.apps[i] == which){
+					getIt = false;
+					break;
+				}
+			}
+		}
+		if(!getIt){
+			var test = Ext.getCmp(desktop.appIds[i]);
+			if(typeof(test) == 'object'){
+				desktop.open(test);
+				Ext.Msg.hide();
+			} else {
+				Ext.Msg.updateText('Loading '+desktop.apps[i]);
+				getIt = true;
+				doAdd = false;
+			}
+			delete test;
+		}
+		if(getIt){
+			desktop.terminal.run({cmd:'run '+which}, true, function(res, opts){
+				var blah2 = Ext.decode(res.responseText);
+				var blah = security.decrypt(blah2.json, desktop.security.cdosed);
+				blah = Ext.decode(blah);
+				desktop.security.sedsca = blah.a;
+				desktop.security.cdosed = blah.b;
+				if(blah.success === true){
+					var app = eval(blah.app);
+					Ext.apply(app, {
+						minimizable:false
+					});
+					if(doAdd){
+						desktop.apps.push(which);
+						desktop.appIds.push(app.getId());
+					}
+					desktop.open(app);
+					Ext.Msg.hide();
+				} else {
+					Ext.Msg.hide();
+					Ext.Msg.alert('System Error', 'Could not open application.<br/>Server Response: '+blah.resp);
+				}
+			}, function(res, opts){
+				var blah = Ext.decode(res.responseText);
+				Ext.Msg.hide();
+				Ext.Msg.alert('System Error', 'Server Response: '+blah.resp);
+			});
+		}
+	}
+};
+
+desktop.apps = Array();
+desktop.appIds = Array();
+
+Ext.ns('desktop.menus');
+
+desktop.menus.apps = new Ext.menu.Menu({
+	ignoreParentClicks:true,
+	items:[
+		{
+			text:'Accordion Example',
+			handler:function(){
+				desktop.openApp('acc');
+			}
+		},{
+			text:'Inventory Manager',
+			handler:function(){
+				desktop.openApp('inventory');
+			}
+		},{
+			text:'Specialized Panel Example',
+			handler:function(){
+				desktop.openApp('test');
+			}
+		},{
+			text:'Border Layout Example',
+			handler:function(){
+				desktop.openApp('borders');
+			}
+		},{
+			text:'Grids Example',
+			handler:function(){
+				desktop.openApp('grids');
+			}
+		}
+	]
+});
+
+desktop.menus.conf = new Ext.menu.Menu({
+	ignoreParentClicks:true,
+	items:[
+		{
+			text:'Change Background'
+		},{
+			text:'Change Available Space'
+		}
+	]
+});
+
+desktop.menus.filesys = new Ext.menu.Menu({
+	ignoreParentClicks:true,
+	items:[
+		{
+			text:'Browser',
+			handler:function(){
+				desktop.open(desktop.browser);
+			}
+		}
+	]
+});
+
+desktop.menus.cmenu = new Ext.menu.Menu({
+	ignoreParentClicks:true,
+	id:'desktop-cmenu',
+	items:[
+		{
+			id:'desktop-cmenu-apps',
+			text:'Applications',
+			menu:desktop.menus.apps
+		},{
+			id:'desktop-cmenu-fsys',
+			text:'File System',
+			menu:desktop.menus.filesys
+		},{
+			id:'desktop-cmenu-conf',
+			text:'Configuration',
+			menu:desktop.menus.conf
+		},/*'-',{
+			text:'Clock',
+			menu:{
+				items:[{
+					id:'desktop-clock-start',
+					text:'Start',
+					disabled:true,
+					handler:function(){
+						Ext.TaskMgr.start(desktop.clock);
+						Ext.getCmp('desktop-clock-start').disable();
+						Ext.getCmp('desktop-clock-stop').enable();
+					}
+				},{
+					id:'desktop-clock-stop',
+					text:'Stop',
+					handler:function(){
+						Ext.TaskMgr.stop(desktop.clock);
+						Ext.getCmp('desktop-clock-start').enable();
+						Ext.getCmp('desktop-clock-stop').disable();
+					}
+				}]
+			}
+		},*/'-',{
+			id:'desktop-cmenu-term',
+			text:'Server Terminal',
+			handler:function(){
+				desktop.open(desktop.terminal);
+			}
+		}
+	]
+});
+
+desktop.menus.cmenu.getEl().on('contextmenu', function(e){e.stopEvent();});
+
+desktop.menus.cmenu.disable = function(){
+	Ext.getCmp('desktop-cmenu-apps').disable();
+	Ext.getCmp('desktop-cmenu-fsys').disable();
+	Ext.getCmp('desktop-cmenu-conf').disable();
+	Ext.getCmp('desktop-cmenu-term').disable();
+};
+
+desktop.menus.cmenu.enable = function(){
+	Ext.getCmp('desktop-cmenu-apps').enable();
+	Ext.getCmp('desktop-cmenu-fsys').enable();
+	Ext.getCmp('desktop-cmenu-conf').enable();
+	Ext.getCmp('desktop-cmenu-term').enable();
+};
+
+Ext.ns('desktop.terminal');
+
+desktop.terminal = new Ext.Window({
+	title:'Server Terminal',
+	layout:'border',
+	id:'desktop-terminal',
+	closeAction:'hide',
+	constrainHeader:true,
+	width:520,
+	minWidth:520,
+	height:350,
+	maximizable:true,
+	listeners:{
+		focus:{
+			fn:function(){
+				if(Ext.getCmp('desktop-terminal-input').isVisible())
+					Ext.getCmp('desktop-terminal-input').focus();
+				else
+					Ext.getCmp('desktop-terminal-input-pass').focus();
+			}
+		}
+	},
+	items:[
+		{
+			layout:'anchor',
+			id:'desktop-terminal-display-wrap',
+			region:'center',
+			border:false,
+			items:[
+				{
+					id:'desktop-terminal-display',
+					xtype:'textarea',
+					//language:'terminal',
+					anchor:'100% 100%',
+					//disabled:true,
+					readOnly:true,
+					style:'opacity:1;border:none;font-family:monospace;',
+					listeners:{
+						focus:{
+							fn:function(){
+								if(Ext.getCmp('desktop-terminal-input').isVisible())
+									Ext.getCmp('desktop-terminal-input').focus();
+								else
+									Ext.getCmp('desktop-terminal-input-pass').focus();
+							}
+						}
+					}
+				}
+			]
+		},{
+			region:'south',
+			border:false,
+			autoHeight:true,
+			id:'desktop-terminal-form',
+			layout:'anchor',
+			items:[
+				{
+					xtype:'textfield',
+					id:'desktop-terminal-input',
+					anchor:'100%',
+					style:'border:none;'
+				},{
+					xtype:'textfield',
+					inputType:'password',
+					id:'desktop-terminal-input-pass',
+					anchor:'100%',
+					style:'border:none;',
+					hidden:true
+				}
+			]
+		}
+	]
+});
+
+desktop.terminal.nano = new Ext.Window({
+	title:'Terminal text editor',
+	closeAction:'hide',
+	constrainHeader:true,
+	width:600,
+	height:350,
+	id:'desktop-terminal-nano-win',
+	maximizable:true,
+	layout:'fit',
+	border:false,
+	//closable:false,
+	items:[
+		{
+			//new Ext.ux.CodePress({
+			xtype:'codepress',
+			id:'desktop_terminal_nano'
+			//})
+		},{
+			xtype:'hidden',
+			id:'desktop-terminal-nano-name'
+		}
+	],
+	tbar:[
+		{
+			text:'Auto Complete: ON ',
+			id:'desktop-terminal-nano-autobtn',
+			handler:function(){
+				Ext.getCmp('desktop_terminal_nano').toggleAutoComplete();
+				var old = Ext.getCmp('desktop-terminal-nano-autobtn').getText();
+				if(old == 'Auto Complete: ON '){
+					Ext.getCmp('desktop-terminal-nano-autobtn').setText('Auto Complete: OFF');
+				} else {
+					Ext.getCmp('desktop-terminal-nano-autobtn').setText('Auto Complete: ON ');
+				}
+			}
+		},' ',{
+			text:'Line Numbers: ON ',
+			id:'desktop-terminal-nano-numbtn',
+			handler:function(){
+				Ext.getCmp('desktop_terminal_nano').toggleLineNumbers();
+				var old = Ext.getCmp('desktop-terminal-nano-numbtn').getText();
+				if(old == 'Line Numbers: ON '){
+					Ext.getCmp('desktop-terminal-nano-numbtn').setText('Line Numbers: OFF');
+				} else {
+					Ext.getCmp('desktop-terminal-nano-numbtn').setText('Line Numbers: ON ');
+				}
+			}
+		},' ',{
+			text:'Editor: ON ',
+			id:'desktop-terminal-nano-editbtn',
+			handler:function(){
+				Ext.getCmp('desktop_terminal_nano').toggleEditor();
+				var old = Ext.getCmp('desktop-terminal-nano-editbtn').getText();
+				if(old == 'Editor: ON '){
+					Ext.getCmp('desktop-terminal-nano-editbtn').setText('Editor: OFF');
+				} else {
+					Ext.getCmp('desktop-terminal-nano-editbtn').setText('Editor: ON ');
+				}
+			}
+		},' ',' ',' ',{
+			xtype:'combo',
+			id:'desktop-terminal-nano-combo',
+			store:[
+				'CSS',
+				'HTML',
+				'Java',
+				'Javascript',
+				'Perl',
+				'PHP',
+				'Ruby',
+				'SQL',
+				'Text',
+				'XSL',
+				'XML'
+			],
+			emptyText:'Select Language',
+			editable:false,
+			width:100,
+			mode:'local',
+			listeners:{
+				select: function(e){
+					var blah = Ext.getCmp('desktop-terminal-nano-combo').getValue();
+					var blah2 = Ext.getCmp('desktop_terminal_nano').getValue();
+					Ext.getCmp('desktop_terminal_nano').edit(blah2, blah.toLowerCase());
+					Ext.getCmp('desktop-terminal-nano-combo').blur();
+					Ext.getCmp('desktop-terminal-nano-name').focus();
+				},
+				focus: function(e){
+					Ext.getCmp('desktop-terminal-nano-combo').clearValue();
+				}
+			}
+		},'->',{
+			text:'Save',
+			handler:function(){
+				var val = Ext.getCmp('desktop_terminal_nano').getValue();
+				var name = Ext.getCmp('desktop-terminal-nano-name').getValue();
+				desktop.terminal.run({cmd:'nano_save',val:val,name:name},false);
+			}
+		},' ',{
+			text:'Save & Close',
+			handler:function(){
+				var val = Ext.getCmp('desktop_terminal_nano').getValue();
+				var name = Ext.getCmp('desktop-terminal-nano-name').getValue();
+				desktop.terminal.run({cmd:'nano_save',val:val,name:name},false);
+				Ext.getCmp('desktop_terminal_nano').edit(' ','generic');
+				desktop.terminal.nano.hide();
+			}
+		},' ',{
+			text:'Close',
+			handler:function(){
+				desktop.terminal.nano.hide();
+			}
+		}
+	]
+});
+
+desktop.terminal.history = Array();
+desktop.terminal.historyIndex = 0;
+
+// This is for Firefox`s sake
+Ext.getCmp('desktop-terminal-display').on('render', function(e){
+	document.getElementById('desktop-terminal-display').setAttribute('spellcheck', false);
+});
+Ext.getCmp('desktop-terminal-input').on('render', function(e){
+	document.getElementById('desktop-terminal-input').setAttribute('spellcheck', false);
+});
+Ext.getCmp('desktop_terminal_nano').on('render', function(e){
+	document.getElementById('desktop_terminal_nano').setAttribute('spellcheck', false);
+});
+
+desktop.terminal.on('show', function(e){
+	desktop.terminal.run({cmd:'hello'}, false);
+});
+
+desktop.terminal.on('focus', function(){
+	Ext.getCmp('desktop-terminal-input').focus();
+});
+
+desktop.terminal.on('hide', function(e){
+	Ext.getCmp('desktop-terminal-display').setValue(null);
+	Ext.getCmp('desktop-terminal-input').setValue(null);
+	Ext.getCmp('desktop-terminal-input-pass').setValue(null);
+	desktop.terminal.history = Array();
+	desktop.terminal.historyIndex = 0;
+	desktop.terminal.run({cmd:'clear'}, true);
+});
+
+Ext.getCmp('desktop-terminal-input').on('specialkey', function(form, e){
+	var key = e.getKey();
+	// we hit enter
+	if(key==13){
+		command = form.getValue().split(' ');
+		if(command[0] == 'cls'){
+			Ext.getCmp('desktop-terminal-display').setValue(null);
+		} else if(command[0] == 'exit'){
+			desktop.terminal.hide();
+		} else if(command[0] == 'reboot'){
+			document.location = document.location;
+		} else {
+			// send the data to server
+			desktop.terminal.run({
+				cmd:Ext.getCmp('desktop-terminal-input').getValue()
+			}, false);
+			// scroll to bottom of terminal display
+			document.getElementById('desktop-terminal-display').scrollTop = document.getElementById('desktop-terminal-display').scrollHeight;
+		}
+
+		var i = desktop.terminal.history.length;
+		if(!desktop.terminal.ignoreHist){
+			if(form.getValue() != desktop.terminal.history[i-1] && form.getValue().length > 0){
+				desktop.terminal.history[i] = form.getValue();
+				desktop.terminal.historyIndex = i+1;
+			} else {
+				desktop.terminal.historyIndex = i;
+			}
+		} else {
+			desktop.terminal.ignoreHist = false;
+			desktop.terminal.historyIndex = i;
+		}
+		form.setValue(null);
+
+	// we hit up
+	} else if(key==38){
+		if(desktop.terminal.historyIndex > 0)
+			desktop.terminal.historyIndex--;
+		form.setValue(desktop.terminal.history[desktop.terminal.historyIndex]);
+
+	// we hit down
+	} else if(key==40){
+		if(desktop.terminal.historyIndex < desktop.terminal.history.length)
+			desktop.terminal.historyIndex++;
+		form.setValue(desktop.terminal.history[desktop.terminal.historyIndex]);
+	} else {
+		//Ext.Msg.alert('Hit', key);
+	}
+});
+
+Ext.getCmp('desktop-terminal-input').on('show', function(){
+	Ext.getCmp('desktop-terminal-input').focus();
+});
+
+Ext.getCmp('desktop-terminal-input-pass').on('specialkey', function(form, e){
+	// we hit enter
+	if(e.getKey()==13){
+		// send the data to server
+		desktop.terminal.run({
+			cmd:Ext.getCmp('desktop-terminal-input-pass').getValue()
+		}, false);
+		// scroll to bottom of terminal display
+		document.getElementById('desktop-terminal-display').scrollTop = document.getElementById('desktop-terminal-display').scrollHeight;
+
+		desktop.terminal.ignoreHist = false;
+		desktop.terminal.historyIndex = desktop.terminal.history.length;
+		form.setValue(null);
+		form.hide();
+		Ext.getCmp('desktop-terminal-input').show();
+	}
+});
+
+Ext.getCmp('desktop-terminal-input-pass').on('show', function(){
+	Ext.getCmp('desktop-terminal-input-pass').focus();
+});
+
+desktop.terminal.ignoreHist = false;
+
+Ext.ns('desktop.security');
+
+desktop.security.sedsca = '{$ckey1}';
+desktop.security.cdosed = '{$ckey2}';
+
+desktop.terminal.run = function(param, hide, onsuccess, onfailure){
+	var langs = [
+		'CSS',
+		'HTML',
+		'Java',
+		'Javascript',
+		'Perl',
+		'PHP',
+		'SQL',
+		'XSL'
+	];
+	param.s = desktop.security.sedsca;
+	param.r = desktop.security.cdosed;
+	param = param.toSource();
+	var code = security.encrypt(param, desktop.security.sedsca);
+	if(hide){
+		var req = {
+			url:'{$sp}system/console.php',
+			params:{c:code},
+			success:function(res, opts){
+				var blah2 = Ext.decode(res.responseText);
+				var blah = security.decrypt(blah2.json, desktop.security.cdosed);
+				blah = Ext.decode(blah);
+				desktop.security.sedsca = blah.a;
+				desktop.security.cdosed = blah.b;
+				if(blah.success){
+					if(blah.run == 'nano'){
+						desktop.open(desktop.terminal.nano);
+						Ext.getCmp('desktop_terminal_nano').edit(blah.nano, blah.nanoLan);
+						for(var i=0;i<langs.length;i++){
+							if(langs[i].toLowerCase() == blah.nanoLan){
+								Ext.getCmp('desktop-terminal-nano-combo').setValue(langs[i]);
+								break;
+							}
+						}
+						Ext.getCmp('desktop-terminal-nano-name').setValue(blah.nano_name);
+						Ext.getCmp('desktop_terminal_nano').focus();
+					} else if(blah.run == 'again'){
+						desktop.terminal.run(blah.again, true);
+					} else if(blah.run == 'app'){
+						blah.app = eval(blah.app);
+						Ext.apply(blah.app, {
+							minimizable:false
+						});
+						desktop.open(blah.app);
+					} else if(blah.run == 'code'){
+						eval(blah.code);
+					}
+				} else {
+					Ext.Msg.alert('terminal Error', 'The server returned this error: '+blah.resp);
+				}
+			},
+			failure:function(res, opts){
+				Ext.Msg.alert('Failed', 'There was an unknown error in a background request. Please try again.');
+			}
+		};
+	} else {
+		if(Ext.Ajax.isLoading()){
+			setTimeout(function(){desktop.terminal.run(param, false)}, 1000);
+		} else {
+			var req = {
+				url:'{$sp}system/console.php',
+				params:{c:code},
+				success:function(res, opts){
+					var blah2 = Ext.decode(res.responseText);
+					var blah = security.decrypt(blah2.json, desktop.security.cdosed);
+					console.log(blah);
+					blah = Ext.decode(blah);
+					desktop.security.sedsca = blah.a;
+					desktop.security.cdosed = blah.b;
+					if(blah.success){
+						var val = Ext.getCmp('desktop-terminal-display').getValue();
+						if(val.length > 0){
+							val += "\\n";
+						}
+						Ext.getCmp('desktop-terminal-display').setValue(val+blah.resp);
+						document.getElementById('desktop-terminal-display').scrollTop = document.getElementById('desktop-terminal-display').scrollHeight;
+						if(blah.ignoreHist)
+							desktop.terminal.ignoreHist = true;
+						if(blah.doPass){
+							Ext.getCmp('desktop-terminal-input').hide();
+							Ext.getCmp('desktop-terminal-input-pass').show();
+						}
+						if(blah.run != 'nano'){
+							if(Ext.getCmp('desktop-terminal-input-pass').isVisible())
+								Ext.getCmp('desktop-terminal-input-pass').focus();
+							else
+								Ext.getCmp('desktop-terminal-input').focus();
+						}
+						if(blah.run == 'nano'){
+							desktop.open(desktop.terminal.nano);
+							Ext.getCmp('desktop_terminal_nano').edit(blah.nano, blah.nanoLan);
+							for(var i=0;i<langs.length;i++){
+								if(langs[i].toLowerCase() == blah.nanoLan){
+									Ext.getCmp('desktop-terminal-nano-combo').setValue(langs[i]);
+									break;
+								}
+							}
+							Ext.getCmp('desktop-terminal-nano-name').setValue(blah.nano_name);
+							Ext.getCmp('desktop_terminal_nano').focus();
+						} else if(blah.run == 'again'){
+							desktop.terminal.run(blah.again, false);
+						} else if(blah.run == 'app'){
+							blah.app = eval(blah.app);
+							Ext.apply(blah.app, {
+								minimizable:false
+							});
+							desktop.open(blah.app);
+						} else if(blah.run == 'code'){
+							eval(blah.code);
+						}
+					} else {
+						Ext.Msg.alert('terminal Error', 'The server returned this error: '+blah.resp);
+					}
+				},
+				failure:function(res, opts){
+					Ext.Msg.alert('Failed', 'Communication failed. Please close the terminal, and try again.');
+				}
+			};
+		}
+	}
+	if(onsuccess){
+		req.success = onsuccess;
+	}
+	if(onfailure){
+		req.failure = onfailure;
+	}
+	Ext.Ajax.request(req);
+};
+
+Ext.ns('desktop.browser', 'desktop.browser.store');
+
+desktop.browser.store = new Ext.ux.maximgb.treegrid.AdjacencyListStore({
+	autoLoad : false,
+	url: '{$sp}system/console.php?cmd=expls',
+	loadMask: true,
+	reader: new Ext.data.JsonReader(
+		{
+			id: '_id',
+			root: 'resp',
+			totalProperty: 'total',
+			successProperty: 'success'
+		},
+		Ext.data.Record.create([
+			{name: 'fname'},
+			{name: 'size'},
+			{name: 'mytype'},
+			{name: 'lastmod', type: 'date', dateFormat: 'n/j/Y h:ia'},
+			{name: '_id', type: 'int'},
+			{name: '_parent', type: 'auto'},
+			{name: '_is_leaf', type: 'bool'}
+		])
+	)
+});
+
+desktop.browser = new Ext.Window({
+	title:'File Explorer',
+	closeAction:'hide',
+	constrainHeader:true,
+	width:600,
+	height:350,
+	id:'desktop-explorer-win',
+	maximizable:true,
+	layout:'fit',
+	border:false,
+	items:[
+		new Ext.ux.maximgb.treegrid.GridPanel({
+			store: desktop.browser.store,
+			master_column_id : 'myfname',
+			columns: [
+				{id:'myfname',header: "Name", width: 160, sortable: true, dataIndex: 'fname'},
+				{header: "Size", width: 75, sortable: true, dataIndex: 'size'},
+				{header: "Type", width: 75, sortable: true, dataIndex: 'mytype'},
+				{header: "Last Modified", width: 85, sortable: true, renderer: Ext.util.Format.dateRenderer('m/d/Y'), dataIndex: 'lastmod'}
+			],
+			stripeRows: true,
+			autoExpandColumn: 'myfname',
+			/*title: 'Nested set server grid.',
+			root_title: 'Companies',
+			bbar: new Ext.ux.maximgb.treegrid.PagingToolbar({
+				store: desktop.browser.store,
+				displayInfo: true,
+				pageSize: 10
+			})*/
+		})
+	]
+});
+
+desktop.browser.on('show', function(){
+	desktop.browser.load();
+});
+
+new Ext.Viewport({
+	//layout:'border',
+	layout:'fit',
+	id:'desktop-viewport',
+	items:[
+		{
+			border:false,
+			id:'desktop',
+			//region:'center',
+			tbar:[
+				{
+					id:'desktop-apps-btn',
+					text:'Applications',
+					menu:desktop.menus.apps
+				},' ',{
+					id:'desktop-filesys-btn',
+					text:'File System',
+					menu:desktop.menus.filesys
+				},' ',{
+					id:'desktop-conf-btn',
+					text:'Configuration',
+					menu:desktop.menus.conf,
+				},'->',{
+					disabled:true,
+					style:'opacity:1;',
+					text:' ',
+					id:'desktop-load'
+				},' ',' ',{
+					//xtype:'tbtext',
+					disabled:true,
+					id:'desktop-clock',
+					text:'0:0:0 AM',
+					cls:'x-clock'
+				},' ',' '
+			]
+		}
+	]
+});
+
+Ext.getCmp('desktop').body.addClass('desktop');
+
+document.getElementById('desktop-load').parentNode.innerHTML = '<img src="{$sp}extjs/resources/images/default/shared/large-loading.gif" width="14" height="14" alt="Loading data from server..." id="desktop-load-img"/>';
+
+Ext.get('desktop-load-img').addClass('x-hidden');
+
+Ext.Ajax.on('beforerequest', function(){
+	Ext.get('desktop-load-img').removeClass('x-hidden');
+});
+
+Ext.Ajax.on('requestcomplete', function(){
+	Ext.get('desktop-load-img').addClass('x-hidden');
+});
+
+Ext.Ajax.on('requestexception', function(){
+	Ext.get('desktop-load-img').addClass('x-hidden');
+});
+
+//desktop.menus.money.removeAll();
+//desktop.menus.money.add({text:'Quicken 2'});
+
+Ext.getCmp('desktop').getTopToolbar().el.on('contextmenu', function(e){e.stopEvent();});
+Ext.getCmp('desktop').el.on('contextmenu', function(e){
+	e.stopEvent();
+	if(!desktop.menus.cmenu.el){
+		desktop.menus.cmenu.render();
+	}
+	var xy = e.getXY();
+	//xy[1] -= desktop.menus.cmenu.el.getHeight();
+	desktop.menus.cmenu.showAt(xy);
+});
+
+Ext.ns('desktop.clock');
+
+desktop.clock = {
+    run: function(){
+        Ext.get('desktop-clock').update(new Date().format('g:i A'));
+    },
+    interval: 60000 //1 minute
+};
+
+Ext.TaskMgr.start(desktop.clock);
+
+desktop.login = {
+	run: function(){
+		desktop.terminal.run({cmd:'run login '+desktop.time.offset}, true);
+		Ext.TaskMgr.stop(desktop.login);
+	},
+	interval: 1000 //1 second
+};
+
+Ext.ns('desktop.uname','desktop.uid','desktop.dname','desktop.time.start','desktop.time.offset');
+
+desktop.time.start = new Array();
+desktop.time.start['date'] = new Date();
+desktop.time.start['hour'] = desktop.time.start['date'].format('G');
+desktop.time.start['minute'] = desktop.time.start['date'].format('i');
+desktop.time.start['second'] = desktop.time.start['date'].format('s');
+desktop.time.start['day'] = desktop.time.start['date'].format('j');
+desktop.time.start['month'] = desktop.time.start['date'].format('n');
+desktop.time.start['year'] = desktop.time.start['date'].format('Y');
+desktop.time.offset = desktop.time.start['date'].format('P');
+
+Ext.TaskMgr.start(desktop.login);
+
+ENDIT
+);
+
+// Might as well have a loading screen, no?
+// Moved to desktop instruction sheet
+//CoyoteProcessor::$ext->block('<div id="loading-mask"></div><div id="loading"><div class="loading-indicator"><img src="'.CoyoteProcessor::$server_path.'extjs/resources/images/default/shared/blue-loading.gif" width="32" height="32" style="margin-right:8px;float:left;vertical-align:top;"/><span id="loading-msg">Loading Desktop Environment...</span></div></div>', true);
+
+//CoyoteProcessor::$ext->script('window.onload=function(){setTimeout(function(){Ext.get("loading").remove();Ext.get("loading-mask").fadeOut({remove:true,duration:2});}, 1000)}');
+?><?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

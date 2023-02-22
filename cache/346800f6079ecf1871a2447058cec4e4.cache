@@ -1,0 +1,16 @@
+<?
+function Coyote_HEADER($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+?>
+<html>
+<head><title><?=$attribs['TITLE']?></title>
+<?
+if($attribs['EXTJS'] == "true")
+	CoyoteProcessor::do_include('includes/ext_header.html');
+echo $innerHTML;
+?>
+</head>
+<body text="<?=$attribs['TEXT']?>" bgcolor="<?=$attribs['BGCOLOR']?>" bg="<?=$attribs['BG']?>" link="<?=$attribs['LINK']?>" vlink="<?=$attribs['VLINK']?>" alink="<?=$attribs['ALINK']?>">
+<?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

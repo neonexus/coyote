@@ -1,0 +1,10 @@
+<?
+function Coyote_BUTTONS($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs){
+$innerHTML = str_replace('}{', '},{', $innerHTML);
+
+CoyoteProcessor::$ext->buttons = '['.$innerHTML.']';
+?>
+<?
+unset($tag_name, $attribs, $innerHTML, $parent, $breadcrumbs);
+}
+?>

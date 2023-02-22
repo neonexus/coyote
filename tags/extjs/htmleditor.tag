@@ -1,0 +1,36 @@
+<?
+## htmleditor ##
+## alias: wysiwyg ##
+## createLinkText = ##
+## defaultLinkValue = ##
+## enableAlignments = true ##
+## enableColors = true ##
+## enableFont = true ##
+## enableFontSize = true ##
+## enableFormat = true ##
+## enableLinks = true ##
+## enableLists = true ##
+## enableSourceEdit = true ##
+## fontFamilies = ##
+
+$output = '';
+
+//require(CoyoteProcessor::$inc_dir.'ext_nesting.php');
+CoyoteProcessor::$ext->startNest($attribs);
+
+if(!empty($attribs['CREATELINKTEXT'])){ $output .= 'createLinkText:\''.$attribs['CREATETEXTLINK'].'\','; }
+if(!empty($attribs['DEFAULTLINKVALUE'])){ $output .= 'defaultLinkValue:\''.$attribs['DEFAULTLINKVALUE'].'\','; }
+if($attribs['ENABLEALIGNMENTS'] != 'true'){ $output .= 'enableAlignments:false,'; }
+if($attribs['ENABLECOLORS'] != 'true'){ $output .= 'enableColors:false,'; }
+if($attribs['ENABLEFONT'] != 'true'){ $output .= 'enableFont:false,'; }
+if($attribs['ENABLEFONTSIZE'] != 'true'){ $output .= 'enableFontSize:false,'; }
+if($attribs['ENABLEFORMAT'] != 'true'){ $output .= 'enableFormat:false,'; }
+if($attribs['ENABLELINKS'] != 'true'){ $output .= 'enableLinks:false,'; }
+if($attribs['ENABLELISTS'] != 'true'){ $output .= 'enableLists:false,'; }
+if($attribs['ENABLESOURCEEDIT'] != 'true'){ $output .= 'enableSourceEdit:false,'; }
+if(!empty($attribs['FONTFAMILIES'])){ $output .= 'fontFamilies:\''.$attribs['FONTFAMILIES'].'\','; }
+
+$output .= CoyoteProcessor::$ext->run_field($attribs);
+
+CoyoteProcessor::$ext->nest('HTMLEditor', 'form.HtmlEditor', $output, $parent, $attribs);
+?>

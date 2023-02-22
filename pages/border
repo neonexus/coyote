@@ -1,0 +1,36 @@
+<ext>
+	<css>
+		.x-tab-panel-header{border:none;padding-bottom:0px;}
+		.x-tab-panel-footer{border:none;padding-top:0px;}
+		.x-tab-panel-footer-plain .x-tab-strip-bottom{background:#DFE8F6 !important;}
+		.x-tab-panel-header-plain .x-tab-strip-top{background:#DFE8F6 !important;}
+		/*.x-tab-panel-header-plain .x-tab-strip-spacer, .x-tab-panel-footer-plain .x-tab-strip-spacer{border-top:none;}*/
+	</css>
+	<borderlayout border="false" autoHeight="true">
+		<center layout="fit" border="false" frame="false">
+			<tabpanel title="Testing the tabs" border="false" plain="true" style="background:transparent;" tabPosition="bottom">
+				<tab title="First tab" frame="true" border="false" autoScroll="true">
+					<form title="Testing the nesting" autoHeight="true">
+						<fieldset title="Some Group" checkboxToggle="true">
+							<password label="Password Field" width="100"/>
+							<textbox label="Just a textbox" width="100"/>
+						</fieldset>
+						<fieldset title="Another Group">
+							<date label="A date field" width="100"/>
+							<textarea width="100" label="Some textarea"/>
+						</fieldset>
+					</form>
+				</tab>
+				<tab title="Test" frame="true" border="false">
+					Just a test
+				</tab>
+			</tabpanel>
+		</center>
+		<west layout="fit" frame="true" collapsible="true" width="150" split="true" minsize="150" maxsize=".5" collapseMode="mini">
+			Our application tree would be shown here, or our currently open application tree...
+		</west>
+		<east collapseMode="mini" layout="fit" frame="true" minsize="150" split="true" width="150" collapsible="true">
+			This is where our file system tree would be
+		</east>
+	</borderlayout>
+</ext>

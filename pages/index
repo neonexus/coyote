@@ -1,0 +1,271 @@
+<doc>
+	<header title="Welcome to Coyote" bgcolor="#DFE8F6" text="#000000" extjs="true">
+		<css file="extjs/examples/desktop/css/desktop.css"/>
+		<css>
+			/*body{ background:#3d71b8 url(http://neonexus.freehostia.com/coyote/extjs/examples/desktop/wallpapers/desk.jpg) no-repeat center top; }*/
+			#x-desktop{ background-image: url(http://192.168.1.109/coyote/extjs/examples/desktop/wallpapers/water.bmp) !important; background:#000000; background-attachment: fixed; background-repeat: no-repeat; }
+			#form-win-shortcut img{ background-image: url(http://192.168.1.109/coyote/extjs/examples/desktop/images/grid48x48.png); height:48px; width:48px; }
+		</css>
+	</header>
+	
+	<!-- The EXT tag is a special wrapper to enclose all ExtJs tags -->
+	<ext>
+		<!-- The JS tag is a special wrapper for holding javascript -->
+		<js>
+			<![CDATA[
+			function closeThemAll(win){
+				win.close();
+			}
+			function miniThemAll(win){
+				win.minimize();
+			}
+			function openWin(which){
+				var desk = MyDesktop.getDesktop();
+				var win = desk.getWindow(which.id);
+				if(!win){
+					win = desk.createWindow(which);
+				}
+				win.show();
+			}
+			
+			function change(val){
+		        if(val > 0){
+		            return '<span style="color:green;">' + val + '</span>';
+		        }else if(val < 0){
+		            return '<span style="color:red;">' + val + '</span>';
+		        }
+		        return val;
+		    }
+
+		    function pctChange(val){
+		        if(val > 0){
+		            return '<span style="color:green;">' + val + '%</span>';
+		        }else if(val < 0){
+		            return '<span style="color:red;">' + val + '%</span>';
+		        }
+		        return val;
+		    }
+			]]>
+		</js>
+
+		<!-- The "itemset" tag is a speical wrapper for groups of items to be attached to elements later in the document -->
+		<!-- To do, for example, top or bottom bars -->
+		<itemset var="myTbar">
+			<button text="Hello"/>
+			<!-- The "splitter" tag has no attributes, and can only be used as a toolbar item -->
+			<splitter/>
+			<button text="World"/>
+			<!-- The "spring" tag has no attributes, and can only be used as a toolbar item -->
+			<spring/>
+			<button text="!"/>
+		</itemset>
+		
+		<!-- The "item" tag is a special wrapper for a single item to be attached to elements later in the document -->
+		<item var="myStatusBar">
+			<statusbar id="mySB" text="This is neat">
+				items:['Chars: 0', ' ', 'Blah!: 0', ' ']
+			</statusbar>
+		</item>
+		
+		<!-- NOTE: All "item" and "itemset" tags MUST be defined BEFORE being referenced -->
+		
+		<itemset var="myBtn">
+			<button text="Open Window" handler="openWin(tmp2);"/>
+		</itemset>
+		
+		<!-- Almost anything can be wrapped in an "item" tag... -->
+		<!-- However, the item tag is generally not nessecary for most top-level tags -->
+		<!-- To get around not having to use the "item" tag, just provide the attribute "var" with the name you wish to use -->
+		<!-- The item tag simply prevents auto rendering -->
+		<item var="tmp2">
+			<!-- The "window" tag is a basic wrapper for almost any ExtJs tag -->
+			<window title="My Window" layout="fit" iconCls="accordion" maximizable="false" constrainHeader="true" height="400" width="250" id="my-win" tbar="myTbar">
+				<panel title="Testing">
+					Just a simple panel test
+				</panel>
+			</window>
+		</item>
+		
+		<!-- The following items are used by our grid application -->
+		<item var="tBox">
+			<textbox allowBlank="false"/>
+		</item>
+		<item var="nBox">
+			<numberfield allowBlank="false" allowNegative="false" maxValue="200"/>
+		</item>
+		<item var="nBox2">
+			<numberfield allowBlank="false" maxValue="200"/>
+		</item>
+		<item var="nBox3">
+			<numberfield allowBlank="false" maxValue="200"/>
+		</item>
+		<item var="dBox">
+			<date format="m/d/Y" minValue="01/01/06"/>
+		</item>
+		
+		<!-- The "dataTable" tag is a wrapper for "datarow" tags -->
+		<!-- It is inteded to be used to store static data, in conjunction with the "storage" tag -->
+		<!-- The "var" attribute is required -->
+		<!-- NOTE: The "dataTable" MUST be defined BEFORE we reference it in a "storage" tag! -->
+		<dataTable var="myData">
+			<!-- The "datarow" tag is a wrapper for "datacolumn" tags -->
+			<!-- It also has a shorthand name, "dr" -->
+			<datarow>
+				<!-- The "dataColumn" tag has no attributes, and is a simple wrapper for data -->
+				<!-- It also has a shorthand name, "dc" -->
+				<datacolumn>3m Co</datacolumn>
+				<datacolumn>71.72</datacolumn>
+				<datacolumn>0.02</datacolumn>
+				<datacolumn>0.03</datacolumn>
+				<datacolumn>9/1 12:00am</datacolumn>
+			</datarow>
+			<dr>
+				<dc>Alcoa Inc</dc>
+				<dc>29.01</dc>
+				<dc>0.42</dc>
+				<dc>1.47</dc>
+				<dc>9/1 12:00am</dc>
+			</dr>
+			<dr>
+				<dc>Altria Group Inc</dc>
+				<dc>83.81</dc>
+				<dc>0.28</dc>
+				<dc>0.34</dc>
+				<dc>9/1 12:00am</dc>
+			</dr>
+			<dr>
+				<dc>American Express Company</dc>
+				<dc>52.55</dc>
+				<dc>0.01</dc>
+				<dc>0.02</dc>
+				<dc>9/1 12:00am</dc>
+			</dr>
+			<dr>
+				<dc>American International Group, Inc.</dc>
+				<dc>64.13</dc>
+				<dc>0.31</dc>
+				<dc>0.49</dc>
+				<dc>9/1 12:00am</dc>
+			</dr>
+		</dataTable>
+		
+		<!-- The "storage" tag is meant to be a map for "dataTable" tags -->
+		<!-- 2 attributes are required, "var" and "data", where "data" is the variable of a "dataTable" -->
+		<storage var="myStorage" data="myData">
+			<!-- The "storageField" tag is where we define how we should handle the data in our "dataTable"-->
+			<!-- This is also where we attach names to our "dataColumn" tags -->
+			<storageField name="company"/>
+			<storageField name="price" type="float"/>
+			<storageField name="change" type="float"/>
+			<storageField name="pctChange" type="float"/>
+			<storageField name="lastChange" type="date" dateFormat="n/j h:ia"/>
+		</storage>
+		
+		<storage var="myStorage2" data="myData">
+			<!-- The "storageField" tag is where we define how we should handle the data in our "dataTable"-->
+			<!-- This is also where we attach names to our "dataColumn" tags -->
+			<storageField name="company"/>
+			<storageField name="price" type="float"/>
+			<storageField name="change" type="float"/>
+			<storageField name="pctChange" type="float"/>
+			<storageField name="lastChange" type="date" dateFormat="n/j h:ia"/>
+		</storage>
+		
+		<dataTable var="comboData">
+			<dr>
+				<dc>Testing</dc>
+			</dr>
+			<dr>
+				<dc>The</dc>
+			</dr>
+			<dr>
+				<dc>Combo</dc>
+			</dr>
+			<dr>
+				<dc>Box</dc>
+			</dr>
+		</dataTable>
+		
+		<storage var="myStorage3" data="comboData">
+			<storageField name="val"/>
+		</storage>
+		
+		<!-- The "app" tag is a special window that can only be used when there is a "desktop" tag in our document -->
+		<!-- All "app" tags MUST appear BEFORE the "desktop" tag -->
+		<app id="form-win" autoScroll="true" layout="fit" name="FormWindow" width="600" height="350" iconCls="icon-grid" title="Form Window" bbar="myStatusBar">
+			<!-- The "borderLayout" tag is a wrapper for 5 different tags -->
+			<!-- It wraps "north, south, east, west, center" tags, each of which can only appear once inside of the "borderLayout" tag -->
+			<borderlayout border="false">
+				<center layout="fit" shim="false" title="NeoNexus's Desktop">
+					<!-- The "tabPanel" tag is a wrapper for "tab" tags -->
+					<tabpanel title="Testing the tabs" border="false" tabPosition="bottom">
+						<!-- The "tab" tag is a wrapper for almost any ExtJs tag -->
+						<tab title="First tab" border="true" frame="true">
+							<!-- The "form" tag is just a wrapper for form tags (ex. "textbox", "password", etc) -->
+							<form title="Testing the nesting">
+								<!-- The "fieldset" tag is a wrapper that should only be used in "form" tags -->
+								<fieldset title="Some Group" checkboxToggle="true">
+									<password label="Password Field" width="100"/>
+									<textbox label="Just a textbox" width="100"/>
+								</fieldset>
+								<fieldset title="Another Group">
+									<date label="A date field" width="100"/>
+									<!--<combobox label="A combo box" width="100" storage="myStorage3"/>-->
+									<textarea width="100" label="Some textarea"/>
+								</fieldset>
+							</form>
+						</tab>
+						<tab title="Test">
+							Testing
+						</tab>
+					</tabpanel>
+				</center>
+				<west title="Applications" titleCollapse="true" layout="fit" frame="true" collapsible="true" width="150" split="true" minsize="150" collapseMode="mini">
+					Our application tree would be shown here, or our currently open application tree...
+				</west>
+				<east title="File System" collapseMode="mini" layout="fit" frame="true" minsize="150" split="true" width="150" collapsible="true" titleCollapse="true">
+					This is where our file system tree would be
+				</east>
+			</borderlayout>
+		</app>
+		
+		<app id="acc-win" name="PanelWindow" maximizable="false" resizable="false" iconCls="accordion" width="250" height="400" title="Panel Window">
+			<panel title="Test Panel" collapsible="true" frame="true" titleCollapse="true">
+				This is just a simple panel. The panel can be collapsed, but the window can not be resized, or maximized.
+			</panel>
+		</app>
+		
+		<app id="grid-win" name="GridWindow" iconCls="icon-grid" tbar="myTbar" title="Grid Window" width="600" height="350">
+			<tabpanel border="false">
+				<tab title="Simple Grid" frame="true">
+					<grid storage="myStorage" autoExpandColumn="comp1" numberRows="true">
+						<gridColumn header="Company" id="comp1" dataIndex="company"/>
+						<gridColumn header="Price" renderer="'usMoney'" dataIndex="price" width="75"/>
+						<gridColumn header="Change" renderer="change" dataIndex="change" width="75"/>
+						<gridColumn header="% Change" renderer="pctChange" dataIndex="pctChange" width="75"/>
+						<gridColumn header="Last Updated" renderer="Ext.util.Format.dateRenderer('m/d/Y')" dataIndex="lastChange" width="85"/>
+					</grid>
+				</tab>
+				<tab title="Editable Grid" layout="anchor" frame="true">
+					<editorgrid storage="myStorage2" anchor="100%" clicksToEdit="1" hideMode="offsets" autoExpandColumn="comp2" numberRows="true">
+						<gridColumn header="Company" id="comp2" editor="tBox" dataIndex="company" width="160"/>
+						<gridColumn header="Price" renderer="'usMoney'" editor="nBox" dataIndex="price" width="75"/>
+						<gridColumn header="Change" renderer="change" editor="nBox2" dataIndex="change" width="75"/>
+						<gridColumn header="% Change" renderer="pctChange" editor="nBox3" dataIndex="pctChange" width="75"/>
+						<gridColumn header="Last Updated" editor="dBox" renderer="Ext.util.Format.dateRenderer('m/d/Y')" dataIndex="lastChange" width="85"/>
+					</editorgrid>
+				</tab>
+			</tabpanel>
+		</app>
+		
+		<!-- This tag is very special, because it takes control over the entire viewing area of the browser -->
+		<!-- It also provides special functionality for control over windows -->
+		<desktop taskbar="bottom" username="Some User">
+			<shortcuts>
+				<shortcut for="form-win">Form Window</shortcut>
+				<shortcut for="acc-win" label="Panel Window"/>
+				<shortcut for="grid-win" label="Grid Window"/>
+			</shortcuts>
+		</desktop>
+	</ext>
+</doc>

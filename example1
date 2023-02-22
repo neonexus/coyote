@@ -1,0 +1,20 @@
+<doc>
+	<header title="Neat" bgcolor="000000" extjs="true"/>
+	<ext>
+		<window id="login-win" title="Access Restricted" width="300" height="186" layout="accordion">
+			<panel id="login-panel" title="User Login">
+				<form id="login-form" title="Credentials">
+					<textbox id="login-uname" label="Username"/>
+						<password id="login-pass" label="Password"/>
+						<submit text="Login"/>
+				</form>
+			</panel>
+			<panel id="login-register" title="Register">
+				Nothing, you can't register!
+			</panel>
+		</window>
+		<js>
+			Ext.getCmp('login-win').show();
+		</js>
+	</ext>
+</doc>

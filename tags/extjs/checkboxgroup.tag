@@ -1,0 +1,35 @@
+<?
+## checkboxgroup ##
+## alias: radiogroup ##
+## var = ##
+## allowBlank = true ##
+## blankText = ##
+## columns = auto ##
+## vertical = false ##
+
+$output = '';	
+
+require(CoyoteProcessor::$inc_dir.'ext_nesting.php');
+
+if($attribs['ALLOWBLANK'] != 'true'){ $output .= 'allowBlank:false,'; }
+if(!empty($attribs['BLANKTEXT'])){ $output .= 'blankText:\''.$attribs['BLANKTEXT'].'\','; }
+if($attribs['COLUMNS'] != 'auto'){ $output .= 'columns:'.$attribs['COLUMNS'].','; }
+if($attribs['VERTICAL'] != 'false'){ $output .= 'vertical:true,'; }
+
+$output .= CoyoteProcessor::$ext->run_field($attribs);
+
+if(!empty($innerHTML)){
+	$tmp = substr($innerHTML, 0, 1);
+	if($tmp == '{'){
+		$innerHTML = str_replace('}{', '},{', $innerHTML);
+		$output .= 'items:['.$innerHTML.']';
+	} else {
+		$output .=  $innerHTML;
+	}
+}
+
+if($tag_name == 'CHECKBOXGROUP')
+	CoyoteProcessor::$ext->nest('CheckboxGroup', 'form.CheckboxGroup', $output, $parent, $attribs);
+else
+	CoyoteProcessor::$ext->nest('RadioGroup', 'form.RadioGroup', $output, $parent, $attribs);
+?>
